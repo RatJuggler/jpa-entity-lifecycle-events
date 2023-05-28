@@ -35,7 +35,9 @@ class JpaEntityLifecycleEventsApplicationTests {
     Customer customer3 = new Customer("Test3", "User3", "secret3");
     customerRepository.save(customer3);
 
+    log.info("Flush Customers...");
     customerRepository.flush();
+    log.info("Clear Customers from cache...");
     entityManager.clear();
 
     // exerciseCustomers();
@@ -52,7 +54,9 @@ class JpaEntityLifecycleEventsApplicationTests {
     customerLink3.setCustomer(customerRepository.findById(3L));
     customerLinkRepository.save(customerLink3);
 
+    log.info("Flush CustomerLinks...");
     customerLinkRepository.flush();
+    log.info("Clear CustomerLinks from cache...");
     entityManager.clear();
 
     // exerciseCustomerLinks();
