@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -17,6 +18,7 @@ public class CustomerLink {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
+  @Column(unique=true)
 	private String account;
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id", referencedColumnName = "id")

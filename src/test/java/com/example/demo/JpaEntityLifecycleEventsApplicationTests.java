@@ -54,15 +54,37 @@ class JpaEntityLifecycleEventsApplicationTests {
     entityManager.clear();
 
     log.info("");
+    log.info("Scenario 1 - Find by Primary Key (entity can be identified in the cache)");
+    log.info("--------------------------------");
+    log.info("");
     log.info("Customer found with findById(1L):");
     log.info("---------------------------------");
-    Customer customer = customerRepository.findById(1L);
-    log.info(customer.toString());
+    Customer customerS1 = customerRepository.findById(1L);
+    log.info(customerS1.toString());
     log.info("");
 
-    log.info("CustomerLinks found with findByAccount('customer1'):");
-    log.info("----------------------------------------------------");
-    customerLinkRepository.findByAccount("customer1").forEach(found -> log.info(found.toString()));
+    log.info("CustomerLink found with findById(4L):");
+    log.info("-------------------------------------");
+    CustomerLink customerLinkS1 = customerLinkRepository.findById(4L);
+    log.info(customerLinkS1.toString());
+    log.info("");
+
+    entityManager.clear();
+
+    log.info("");
+    log.info("Scenario 2 - Find by Alternate Key (cache must be flushed?)");
+    log.info("----------------------------------");
+    log.info("");
+    log.info("Customer found with findById(1L):");
+    log.info("---------------------------------");
+    Customer customerS2 = customerRepository.findById(1L);
+    log.info(customerS2.toString());
+    log.info("");
+
+    log.info("CustomerLink found with findByAccount('customer1'):");
+    log.info("---------------------------------------------------");
+    CustomerLink customerLinkS2 = customerLinkRepository.findByAccount("customer1");
+    log.info(customerLinkS2.toString());
     log.info("");
   }
 
@@ -112,14 +134,15 @@ class JpaEntityLifecycleEventsApplicationTests {
     // fetch an individual customer link by ID
     log.info("CustomerLink found with findById(4L):");
     log.info("-------------------------------------");
-    CustomerLink customerLink = customerLinkRepository.findById(4L);
-    log.info(customerLink.toString());
+    CustomerLink customerLinkById = customerLinkRepository.findById(4L);
+    log.info(customerLinkById.toString());
     log.info("");
 
     // fetch customer links by account
     log.info("CutomerLink found with findByAccount('customer3'):");
     log.info("--------------------------------------------------");
-    customerLinkRepository.findByAccount("customer3").forEach(found -> log.info(found.toString()));
+    CustomerLink customerLinkByAccount = customerLinkRepository.findByAccount("customer3");
+    log.info(customerLinkByAccount.toString());
     log.info("");
   }
 }
