@@ -33,20 +33,19 @@ public class CustomerJpaEventListener {
   @PostUpdate
   private void afterAnyUpdate(Customer customer) {
     log.info("Add/update complete for customer: {}", customer.getId());
-    String encodedSecret = customer.getSecret();
-    byte[] decodedBytes = Base64.getDecoder().decode(encodedSecret);
-    String decodedSecret = new String(decodedBytes);    
-    customer.setSecret(decodedSecret);
-    log.info("Secret decoded: {} -> {}", encodedSecret, decodedSecret);
+    customer.setSecret(decodeSecret(customer.getSecret()));
   }
   
   @PostLoad
   private void afterLoad(Customer customer) {
     log.info("Customer loaded from database: {}", customer.getId());
-    String encodedSecret = customer.getSecret();
+    customer.setSecret(decodeSecret(customer.getSecret()));
+  }
+
+  private String decodeSecret(String encodedSecret) {
     byte[] decodedBytes = Base64.getDecoder().decode(encodedSecret);
     String decodedSecret = new String(decodedBytes);    
-    customer.setSecret(decodedSecret);
     log.info("Secret decoded: {} -> {}", encodedSecret, decodedSecret);
+    return decodedSecret;
   }
 }

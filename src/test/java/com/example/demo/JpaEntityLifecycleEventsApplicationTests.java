@@ -28,12 +28,9 @@ class JpaEntityLifecycleEventsApplicationTests {
   @Test
 	void testEverything() {
     // save a few customers
-    Customer customer1 = new Customer("Test1", "User1", "secret1");
-    customerRepository.save(customer1);
-    Customer customer2 = new Customer("Test2", "User2", "secret2");
-    customerRepository.save(customer2);
-    Customer customer3 = new Customer("Test3", "User3", "secret3");
-    customerRepository.save(customer3);
+    createCustomer("Test1", "User1", "secret1");
+    createCustomer("Test2", "User2", "secret2");
+    createCustomer("Test3", "User3", "secret3");
 
     log.info("Flush Customers...");
     customerRepository.flush();
@@ -44,15 +41,9 @@ class JpaEntityLifecycleEventsApplicationTests {
     entityManager.clear();
 
     // save a few customer links
-    CustomerLink customerLink1 = new CustomerLink("customer1");
-    customerLink1.setCustomer(customerRepository.findById(1L));
-    customerLinkRepository.save(customerLink1);
-    CustomerLink customerLink2 = new CustomerLink("customer2");
-    customerLink2.setCustomer(customerRepository.findById(2L));
-    customerLinkRepository.save(customerLink2);
-    CustomerLink customerLink3 = new CustomerLink("customer3");
-    customerLink3.setCustomer(customerRepository.findById(3L));
-    customerLinkRepository.save(customerLink3);
+    createCustomerLink("customer1", 1L);
+    createCustomerLink("customer2", 2L);
+    createCustomerLink("customer3", 3L);
 
     log.info("Flush CustomerLinks...");
     customerLinkRepository.flush();
@@ -73,6 +64,17 @@ class JpaEntityLifecycleEventsApplicationTests {
     log.info("---------------------------------------------------");
     customerLinkRepository.findByAccount("customer1").forEach(found -> log.info(found.toString()));
     log.info("");
+  }
+
+  private void createCustomer(String firstName, String lastName, String secret) {
+    Customer customer = new Customer(firstName, lastName, secret);
+    customerRepository.save(customer);
+  }
+
+  private void createCustomerLink(String account, Long customerId) {
+    CustomerLink customerLink = new CustomerLink(account);
+    customerLink.setCustomer(customerRepository.findById(customerId).orElseThrow());
+    customerLinkRepository.save(customerLink);
   }
 
   private void exerciseCustomers() {
