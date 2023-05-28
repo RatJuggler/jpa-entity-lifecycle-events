@@ -54,14 +54,14 @@ class JpaEntityLifecycleEventsApplicationTests {
     entityManager.clear();
 
     log.info("");
-    log.info("Find a Customer with findById(1L):");
-    log.info("----------------------------------");
+    log.info("Customer found with findById(1L):");
+    log.info("---------------------------------");
     Customer customer = customerRepository.findById(1L);
     log.info(customer.toString());
     log.info("");
 
-    log.info("Find a CutomerLink with findByAccount('customer1'):");
-    log.info("---------------------------------------------------");
+    log.info("CustomerLinks found with findByAccount('customer1'):");
+    log.info("----------------------------------------------------");
     customerLinkRepository.findByAccount("customer1").forEach(found -> log.info(found.toString()));
     log.info("");
   }
@@ -87,9 +87,9 @@ class JpaEntityLifecycleEventsApplicationTests {
     log.info("");
 
     // fetch an individual customer by ID
-    Customer customer = customerRepository.findById(1L);
     log.info("Customer found with findById(1L):");
     log.info("---------------------------------");
+    Customer customer = customerRepository.findById(1L);
     log.info(customer.toString());
     log.info("");
 
@@ -110,9 +110,9 @@ class JpaEntityLifecycleEventsApplicationTests {
     log.info("");
 
     // fetch an individual customer link by ID
-    CustomerLink customerLink = customerLinkRepository.findById(4L);
     log.info("CustomerLink found with findById(4L):");
     log.info("-------------------------------------");
+    CustomerLink customerLink = customerLinkRepository.findById(4L);
     log.info(customerLink.toString());
     log.info("");
 
