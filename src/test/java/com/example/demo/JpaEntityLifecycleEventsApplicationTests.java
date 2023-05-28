@@ -72,7 +72,7 @@ class JpaEntityLifecycleEventsApplicationTests {
     entityManager.clear();
 
     log.info("");
-    log.info("Scenario 2 - Find by Alternate Key (cache must be flushed?)");
+    log.info("Scenario 2 - Find by Alternate Key (cache is flushed to ensure query results are correct)");
     log.info("----------------------------------");
     log.info("");
     log.info("Customer found with findById(1L):");
