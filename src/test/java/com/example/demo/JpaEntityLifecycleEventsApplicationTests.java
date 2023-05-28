@@ -54,17 +54,17 @@ class JpaEntityLifecycleEventsApplicationTests {
     entityManager.clear();
 
     log.info("");
-    log.info("Scenario 1 - Find by Primary Key (entity can be identified in the cache)");
-    log.info("--------------------------------");
+    log.info("Scenario 1 - Find the same Customer/CustomerLink by Primary Key (entity can be identified in the cache)");
+    log.info("-------------------------------------------------------------------------------------------------------");
     log.info("");
-    log.info("Customer found with findById(1L):");
-    log.info("---------------------------------");
+    log.info("Find Customer with findById(1L):");
+    log.info("--------------------------------");
     Customer customerS1 = customerRepository.findById(1L);
     log.info(customerS1.toString());
     log.info("");
 
-    log.info("CustomerLink found with findById(4L):");
-    log.info("-------------------------------------");
+    log.info("Find CustomerLink for the same Customer with findById(4L):");
+    log.info("----------------------------------------------------------");
     CustomerLink customerLinkS1 = customerLinkRepository.findById(4L);
     log.info(customerLinkS1.toString());
     log.info("");
@@ -72,19 +72,40 @@ class JpaEntityLifecycleEventsApplicationTests {
     entityManager.clear();
 
     log.info("");
-    log.info("Scenario 2 - Find by Alternate Key (cache is flushed to ensure query results are correct)");
-    log.info("----------------------------------");
+    log.info("Scenario 2 - Find the same Customer/CustomerLink by Alternate Key (cache is flushed and linked entity is the same)");
+    log.info("------------------------------------------------------------------------------------------------------------------");
     log.info("");
-    log.info("Customer found with findById(1L):");
-    log.info("---------------------------------");
+    log.info("Find Customer with findById(1L):");
+    log.info("--------------------------------");
     Customer customerS2 = customerRepository.findById(1L);
     log.info(customerS2.toString());
     log.info("");
 
-    log.info("CustomerLink found with findByAccount('customer1'):");
-    log.info("---------------------------------------------------");
+    // detaching the intial Customer entity would give the correct result.
+    // entityManager.detach(customerS2);
+
+    log.info("Find CustomerLink for the same Customer with findByAccount('customer1'):");
+    log.info("------------------------------------------------------------------------");
     CustomerLink customerLinkS2 = customerLinkRepository.findByAccount("customer1");
     log.info(customerLinkS2.toString());
+    log.info("");
+
+    entityManager.clear();
+
+    log.info("");
+    log.info("Scenario 3 - Find different Customer/CustomerLink by Alternate Key (cache is flushed but linked entity is different)");
+    log.info("--------------------------------------------------------------------------------------------------------------------");
+    log.info("");
+    log.info("Find Customer with findById(1L):");
+    log.info("-------------- -----------------");
+    Customer customerS3 = customerRepository.findById(1L);
+    log.info(customerS3.toString());
+    log.info("");
+
+    log.info("Find CustomerLink for a diferent Customer with findByAccount('customer3'):");
+    log.info("--------------------------------------------------------------------------");
+    CustomerLink customerLinkS3 = customerLinkRepository.findByAccount("customer3");
+    log.info(customerLinkS3.toString());
     log.info("");
   }
 

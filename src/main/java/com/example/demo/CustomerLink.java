@@ -20,6 +20,7 @@ public class CustomerLink {
 	private Long id;
   @Column(unique=true)
 	private String account;
+  // fetch type EAGER only seems affect loading when findById used.
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id", referencedColumnName = "id")
   private Customer customer;
