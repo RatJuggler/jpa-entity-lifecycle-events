@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerLinkRepository extends JpaRepository<CustomerLink, Long> {
 
-	CustomerLink findByAccount(String account);
+  CustomerLink findByAccount(String account);
 
   CustomerLink findById(long id);
 }

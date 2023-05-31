@@ -10,37 +10,37 @@ import javax.persistence.Id;
 @EntityListeners(CustomerJpaEventListener.class)
 public class Customer {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-	private String firstName;
-	private String lastName;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  private Long id;
+  private String firstName;
+  private String lastName;
   private String secret;
 
-	protected Customer() {}
+  protected Customer() {}
 
-	public Customer(String firstName, String lastName, String secret) {
-		this.firstName = firstName;
-		this.lastName = lastName;
+  public Customer(String firstName, String lastName, String secret) {
+    this.firstName = firstName;
+    this.lastName = lastName;
     this.secret = secret;
-	}
+  }
 
-	@Override
-	public String toString() {
-		return String.format("User[id=%d, firstName='%s', lastName='%s', secret='%s']", id, firstName, lastName, secret);
-	}
+  @Override
+  public String toString() {
+    return String.format("Customer[id=%d, firstName='%s', lastName='%s', secret='%s']", id, firstName, lastName, secret);
+  }
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getFirstName() {
-		return firstName;
-	}
+  public String getFirstName() {
+    return firstName;
+  }
 
-	public String getLastName() {
-		return lastName;
-	}
+  public String getLastName() {
+    return lastName;
+  }
 
   public String getSecret() {
     return secret;
