@@ -24,9 +24,8 @@ class JpaEntityLifecycleEventsApplicationTests {
   
   @Autowired
   private CustomerLinkRepository customerLinkRepository;
-  
-  @Test
-	void testEverything() {
+
+  private void populate() {
     // save a few customers
     createCustomer("Test1", "User1", "secret1");
     createCustomer("Test2", "User2", "secret2");
@@ -34,10 +33,8 @@ class JpaEntityLifecycleEventsApplicationTests {
 
     log.info("Flush Customers...");
     customerRepository.flush();
-    log.info("Clear Customers from cache...");
-    entityManager.clear();
-
     // exerciseCustomers();
+    log.info("Clear Customers from cache...");
     entityManager.clear();
 
     // save a few customer links
@@ -47,66 +44,9 @@ class JpaEntityLifecycleEventsApplicationTests {
 
     log.info("Flush CustomerLinks...");
     customerLinkRepository.flush();
+    // exerciseCustomerLinks();
     log.info("Clear CustomerLinks from cache...");
     entityManager.clear();
-
-    // exerciseCustomerLinks();
-    entityManager.clear();
-
-    log.info("");
-    log.info("Scenario 1 - Find the same Customer/CustomerLink by Primary Key (entity can be identified in the cache)");
-    log.info("-------------------------------------------------------------------------------------------------------");
-    log.info("");
-    log.info("Find Customer with findById(1L):");
-    log.info("--------------------------------");
-    Customer customerS1 = customerRepository.findById(1L);
-    log.info(customerS1.toString());
-    log.info("");
-
-    log.info("Find CustomerLink for the same Customer with findById(4L):");
-    log.info("----------------------------------------------------------");
-    CustomerLink customerLinkS1 = customerLinkRepository.findById(4L);
-    log.info(customerLinkS1.toString());
-    log.info("");
-
-    entityManager.clear();
-
-    log.info("");
-    log.info("Scenario 2 - Find the same Customer/CustomerLink by Alternate Key (cache is flushed and linked entity is the same)");
-    log.info("------------------------------------------------------------------------------------------------------------------");
-    log.info("");
-    log.info("Find Customer with findById(1L):");
-    log.info("--------------------------------");
-    Customer customerS2 = customerRepository.findById(1L);
-    log.info(customerS2.toString());
-    log.info("");
-
-    // detaching the intial Customer entity would give the correct result.
-    // entityManager.detach(customerS2);
-
-    log.info("Find CustomerLink for the same Customer with findByAccount('customer1'):");
-    log.info("------------------------------------------------------------------------");
-    CustomerLink customerLinkS2 = customerLinkRepository.findByAccount("customer1");
-    log.info(customerLinkS2.toString());
-    log.info("");
-
-    entityManager.clear();
-
-    log.info("");
-    log.info("Scenario 3 - Find different Customer/CustomerLink by Alternate Key (cache is flushed but linked entity is different)");
-    log.info("--------------------------------------------------------------------------------------------------------------------");
-    log.info("");
-    log.info("Find Customer with findById(1L):");
-    log.info("-------------- -----------------");
-    Customer customerS3 = customerRepository.findById(1L);
-    log.info(customerS3.toString());
-    log.info("");
-
-    log.info("Find CustomerLink for a diferent Customer with findByAccount('customer3'):");
-    log.info("--------------------------------------------------------------------------");
-    CustomerLink customerLinkS3 = customerLinkRepository.findByAccount("customer3");
-    log.info(customerLinkS3.toString());
-    log.info("");
   }
 
   private void createCustomer(String firstName, String lastName, String secret) {
@@ -118,6 +58,100 @@ class JpaEntityLifecycleEventsApplicationTests {
     CustomerLink customerLink = new CustomerLink(account);
     customerLink.setCustomer(customerRepository.findById(customerId).orElseThrow());
     customerLinkRepository.save(customerLink);
+  }
+
+  @Test
+	void testEverything() {
+    populate();
+
+    // scenario1();
+    // entityManager.clear();
+
+    scenario2();
+    entityManager.clear();
+
+    // scenario3();
+    // entityManager.clear();
+  }
+
+  /**
+   * Find the Customer via it's primary key.
+   * - postLoad event triggers for Customer and decodes secret.
+   * Find the CustomerLink for the Customer via it's primary key.
+   * - postLoad event triggers for CustomerLink, but no events trigger for Customer.
+   * PASS: Secret is left decoded.
+   */
+  private void scenario1() {
+    log.info("");
+    log.info("Scenario 1");
+    log.info("==========");
+    log.info("");
+    log.info("Find Customer with findById(1L):");
+    log.info("--------------------------------");
+    Customer customer = customerRepository.findById(1L);
+    log.info(customer.toString());
+    log.info("");
+
+    log.info("Find CustomerLink for the same Customer with findById(4L):");
+    log.info("----------------------------------------------------------");
+    CustomerLink customerLink = customerLinkRepository.findById(4L);
+    log.info(customerLink.toString());
+    log.info("");
+  }
+
+  /**
+   * Find the Customer via it's primary key.
+   * - postLoad event triggers for Customer and decodes secret.
+   * Find the CustomerLink for the Customer via the Customer entity.
+   * - preUpdate event triggers for Customer and encodes the secret.
+   * - Customer is not flushed to database, postUpdate event is NOT triggered.
+   * - postLoad event triggers for CustomerLink.
+   * FAILS: Secret is left encoded.
+   */
+  private void scenario2() {
+    log.info("");
+    log.info("Scenario 2");
+    log.info("==========");
+    log.info("");
+    log.info("Find Customer with findById(1L):");
+    log.info("--------------------------------");
+    Customer customer = customerRepository.findById(1L);
+    log.info(customer.toString());
+    log.info("");
+
+    log.info("Find CustomerLink for the same Customer with findByCustomer(customer):");
+    log.info("----------------------------------------------------------------------");
+    CustomerLink customerLink = customerLinkRepository.findByCustomer(customer);
+    log.info(customerLink.toString());
+    log.info("");
+  }
+
+  /**
+   * Find the Customer via it's primary key.
+   * - postLoad event triggers for Customer and decodes secret.
+   * Find the CustomerLink for the Customer via the Customer entity.
+   * - preUpdate event triggers for Customer and encodes the secret.
+   * - Customer is flushed to database.
+   * - postUpdate event trigger for Customer and decodes the secret.
+   * - postLoad event triggers for CustomerLink.
+   * FAILS: Secret is left decoded at the expense of an unwanted update.
+   */
+  private void scenario3() {
+    log.info("");
+    log.info("Scenario 3");
+    log.info("==========");
+    log.info("");
+    log.info("Find Customer with findById(1L):");
+    log.info("-------------- -----------------");
+    Customer customer = customerRepository.findById(1L);
+    log.info(customer.toString());
+    log.info("");
+
+    log.info("Find CustomerLink for the same Customer with findByCustomerId(customer.getId()):");
+    log.info("--------------------------------------------------------------------------------");
+    CustomerLink customerLink = customerLinkRepository.findByCustomerId(customer.getId());
+    log.info(customerLink.toString());
+    log.info("");
   }
 
   private void exerciseCustomers() {
